@@ -4,19 +4,6 @@ function getComputerChoice() {
     return Math.floor(Math.random() * 3);
 }
 
-function getHumanChoice() {
-    const validInputs = ['0', '1', '2'];
-    let choice;
-    while (true) {
-        choice = prompt('Enter 0 for rock, or 1 for paper, or 2 for scissors');
-        if (validInputs.includes(choice)) {
-            break;
-        }
-        console.log('Invalid input. Please enter 0 for rock, or 1 for paper, or 2 for scissors');
-    }
-    return choice;
-}
-
 const ROCK = 0;
 const PAPER = 1;
 const SCISSORS = 2;
@@ -30,8 +17,20 @@ const outcomes = [
     [LOSE, WIN, DRAW]  // Scissors
 ];
 
-function playRound(humanChoice, computerChoice) {
-    humanChoice = getHumanChoice();
+// Scores kept outside any function to maintain their values across rounds
+let humanScore = 0;
+let computerScore = 0;
+
+const btnRock = document.querySelector("#btn-rock");
+btnRock.addEventListener("click", () => playRound(ROCK));
+
+const btnPaper = document.querySelector("#btn-paper");
+btnPaper.addEventListener("click", () => playRound(PAPER));
+
+const btnScissors = document.querySelector("#btn-scissors");
+btnScissors.addEventListener("click", () => playRound(SCISSORS));
+
+function playRound(humanChoice) {
     console.log(`Your choice = ${humanChoice}`);
 
     computerChoice = getComputerChoice();
@@ -40,8 +39,26 @@ function playRound(humanChoice, computerChoice) {
     const result = outcomes[humanChoice][computerChoice];
     const message = getResultMessage(humanChoice, computerChoice, result);
     console.log(message);
+    console.log(humanScore);
+    console.log(computerScore);
 
-    return result;
+    const printScore = document.querySelector(".scores");
+    printScore.textContent = `Human: ${humanScore}, Computer: ${computerScore}`;
+
+    const printMessage = document.querySelector(".results");
+    printMessage.textContent = message;
+
+    if (humanScore === 5) {
+        declareWinner("human");
+    } else if (computerScore === 5) {
+        declareWinner("computer");
+    }
+
+    if (result === WIN) {
+        humanScore++;
+    } else if (result === LOSE) {
+        computerScore++;
+    }
 }
 
 function getResultMessage(humanChoice, computerChoice, result) {
@@ -55,26 +72,13 @@ function getResultMessage(humanChoice, computerChoice, result) {
     }
 }
 
-function playGame() {
-    const NUM_ROUNDS = 5;
-    let humanScore = 0;
-    let computerScore = 0;
-    let round = 0;
-    for (let i = 0; i < NUM_ROUNDS; i++) {
-        let result = playRound();
-        if (result == 1) {
-            humanScore++;
-        } else if (result == 0) {
-            computerScore++;
-        }
-    }
-    logScore(humanScore, computerScore);
-}
+function declareWinner(winner) {
+    const result = document.querySelector(".results");
+    const resultWinner   = document.createElement("p");
+    resultWinner.textContent = `The winner is ${winner}`;
+    result.appendChild(resultWinner);
 
-function logScore(humanScore, computerScore) {
-    console.log('Final score');
-    console.log(`Your score: ${humanScore}`);
-    console.log(`Computer score: ${computerScore}`);
+    // Reset scores for a new game
+    humanScore = 0;
+    computerScore = 0;
 }
-
-playGame();
